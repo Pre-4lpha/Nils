@@ -50,7 +50,7 @@ public:
 };
 
 
-class Rakete : public Objekt {
+class Raumschiff : public Objekt {
 public:
 	int Geschwindigkeit;
 	double rotation;
