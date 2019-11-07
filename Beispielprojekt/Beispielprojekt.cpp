@@ -14,6 +14,19 @@ int Fenster_x = 1920;
 int Fenster_y = 1080;
 int Zeit = 0;
 double rot_geschwindigkeit = 0.2;
+//*************************************start
+double misx = 0.0;
+double misy = 0.0;
+double misxnew = 0.0;
+double misynew = 0.0;
+bool misexist = false;
+double x_maus = 0;
+double y_maus = 0;
+double deltax = 0.0;
+double deltay = 0.0;
+double deltad = 0.0;
+double reichweite = 1000;
+//*************************************end
 
 class Objekt {
 public:
@@ -80,7 +93,7 @@ class GameWindow : public Gosu::Window
 {
 public:
 	Gosu::Image Raumschiff;
-
+	
 	Earth erde;
 	GameWindow()
 		: Window(Fenster_x, Fenster_y),
@@ -95,15 +108,52 @@ public:
 	void draw() override
 	{
 		erde.draw_erde();
+		//*************************************start
+		Raumschiff.draw(x_maus, y_maus, 0.0,
+			1.0, // Rotationswinkel in Grad
+			1.0 // Position der "Mitte" relativ zu x, y (*20=Pixel)
+		);
+		if (misexist == true)
+		{
+			if (misx == 0 || misy == 0)
+			{
+				misx = 100;
+				misy = 100;
+			}
+			deltax = x_maus - misx;
+			deltay = y_maus - misy;
+			deltad = sqrt((y_maus - misy) * (y_maus - misy) + (x_maus - misx) * (x_maus - misx));
+			misxnew = misx + ((deltax / deltad) * 8);
+			misynew = misy + ((deltay / deltad) * 8);
+			//rot = (double)(((int)(270 + asin(deltay / deltad))) % 360);
+			//rot = 45.0;
+			reichweite = reichweite - sqrt((misynew - misy) * (misynew - misy) + (misxnew - misx) * (misxnew - misx));
+			if (reichweite <= 0 || deltad <= 30)
+			{
+				misexist = false;
+				reichweite = 1000;
+			}
+			Raumschiff.draw_rot(misxnew, misynew, 0.0, 45.0, 0.0);
+			misx = misxnew;
+			misy = misynew;
+		}
+		//*************************************end
 	}
 
 	// Wird 60x pro Sekunde aufgerufen
 	void update() override
 	{
-		x += 1;
+		//****************************************start
+		x_maus = input().mouse_x();
+		y_maus = input().mouse_y();
 		if (input().down(Gosu::MS_LEFT)) {
-		
+			misexist = true;
 		}
+		else if (input().down(Gosu::MS_RIGHT))
+		{
+			misexist = false;
+		}
+		//****************************************end
 	}
 };
 
