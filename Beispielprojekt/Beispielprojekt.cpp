@@ -25,27 +25,30 @@ public:
 	double pos_y;
 	double rot;
 	Objekt* Target_Objekt_Ptr;
-	Objekt(int x, int y, Objekt* oz, Gosu::Image B) : pos_x(x), pos_y(y), Target_Objekt_Ptr(oz) , Bild(B) {};
+	Objekt(double x, double y, Objekt* oz, Gosu::Image B) : pos_x(x), pos_y(y), Target_Objekt_Ptr(oz) , Bild(B) {};
 	double dy;
 	double dx;
 	double abstand;
 
 	void abstand_berechnen() {
-		double dy = (this->pos_y - this->Target_Objekt_Ptr->pos_y);
+		 dy = ( this->Target_Objekt_Ptr->pos_y- this->pos_y);
 		if (dy == 0)
-			dy += 0,01;
-		double dx = (this->pos_x - this->Target_Objekt_Ptr->pos_x);
+			dy += 0.01;
+		 dx = (this->Target_Objekt_Ptr->pos_x - this->pos_x );
 		if (dx == 0)
-			dx += 0, 01;
+			dx += 0.01;
 		abstand = sqrt(dy*dy + dx*dx);
+		
 
 	};
 	void rot_berechnen() {	
 	this->rot=Gosu::angle(this->pos_x, this->pos_y, this->Target_Objekt_Ptr->pos_x, this->Target_Objekt_Ptr->pos_y, 0);
 	};
 	void bewegung() {
-		this->pos_x = this->dx + ((dx / abstand) * 1);
-		this->pos_y = this->dy + ((dy / abstand) * 1);
+		
+		this->pos_x = (this->pos_x + ((dx / abstand) * 8.0));
+		cout << this->pos_x << endl;
+		this->pos_y = this->pos_y + ((dy / abstand) * 8.0);
 	}
 	void draw()
 	{
@@ -78,7 +81,7 @@ public:
 
 class Raumschiff : public Objekt {
 public:
-	Raumschiff(int x, int y, Objekt* oz, Gosu::Image B) : Objekt(x, y, oz, B) { }
+	Raumschiff(double x, double y, Objekt* oz, Gosu::Image B) : Objekt(x, y, oz, B) { }
 };
 	
 
@@ -89,7 +92,7 @@ public:
 	
 	Raumschiff test1;
 	Raumschiff test2;
-	GameWindow() : Window(Fenster_x, Fenster_y), Bild_Raumschiff("rakete.png"), test1(800, 400, &test2, Bild_Raumschiff), test2(600, 12, &test1, Bild_Raumschiff)
+	GameWindow() : Window(Fenster_x, Fenster_y), Bild_Raumschiff("rakete.png"), test1(800, 40, &test2, Bild_Raumschiff), test2(30, 120, &test1, Bild_Raumschiff)
 	{
 		set_caption("Earth");
 	}
@@ -111,9 +114,9 @@ public:
 	{
 		test1.rot_berechnen();
 		test1.abstand_berechnen();
+		test1.bewegung();
 		test2.rot_berechnen();
 		test2.abstand_berechnen();
-
 		test2.bewegung();
 		//****************************************start
 	
