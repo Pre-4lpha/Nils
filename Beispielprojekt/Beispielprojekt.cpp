@@ -6,7 +6,6 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#define PI 3.14159265
 
 #include "Vektor2d.h"
 using namespace std;
@@ -54,19 +53,8 @@ public:
 		abstand = sqrt(dy*dy + dx*dx);
 
 	};
-	void rot_berechnen() {
-		
-		this->rot = atan(unsigned (this->dy)/unsigned (this->dx)) * 180 / PI;;
-		if ((this->dy && this->dx) < 0) {
-			this->rot = this->rot *(-1);
-		}
-		if ((this->dy) < 0) {
-			this->rot = this->rot *(-1);
-		}
-		if ((this->dx) < 0) {
-			this->rot = 90+(90-this->rot);
-		}
-		
+	void rot_berechnen() {	
+	this->rot=Gosu::angle(this->pos_x, this->pos_y, this->Target_Objekt_Ptr->pos_x, this->Target_Objekt_Ptr->pos_y, 0);
 	};
 	void bewegung() {
 		this->pos_x = this->dx + ((dx / abstand) * 8);
@@ -122,7 +110,7 @@ public:
 	{
 		set_caption("Earth");
 	}
-	int x = 0;
+	
 	// wird bis zu 60x pro Sekunde aufgerufen.
 	// Wenn die Grafikkarte oder der Prozessor nicht mehr hinterherkommen,
 	// dann werden `draw` Aufrufe ausgelassen und die Framerate sinkt
