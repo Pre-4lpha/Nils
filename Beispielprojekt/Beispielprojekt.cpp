@@ -14,96 +14,113 @@ int Fenster_x = 1920;
 int Fenster_y = 1080;
 int Zeit = 0;
 double rot_geschwindigkeit = 0.2;
+//*************************************start
+
+//*************************************end
 
 class Objekt {
 public:
-	int pos_x;
-	int pos_y;
-	signed int rel_pos_x;
-	signed int rel_pos_y;
-	signed int rel_pos()
+	Gosu::Image Bild;
+	double pos_x;
+	double pos_y;
+	double rot;
+	Objekt* Target_Objekt_Ptr;
+	Objekt(double x, double y, Objekt* oz, Gosu::Image B) : pos_x(x), pos_y(y), Target_Objekt_Ptr(oz) , Bild(B) {};
+	double dy;
+	double dx;
+	double abstand;
+
+	void abstand_berechnen() {
+		 dy = ( this->Target_Objekt_Ptr->pos_y- this->pos_y);
+		if (dy == 0)
+			dy += 0.01;
+		 dx = (this->Target_Objekt_Ptr->pos_x - this->pos_x );
+		if (dx == 0)
+			dx += 0.01;
+		abstand = sqrt(dy*dy + dx*dx);
+		
+
+	};
+	void rot_berechnen() {	
+	this->rot=Gosu::angle(this->pos_x, this->pos_y, this->Target_Objekt_Ptr->pos_x, this->Target_Objekt_Ptr->pos_y, 0);
+	};
+	void bewegung() {
+		
+		this->pos_x = (this->pos_x + ((dx / abstand) * 8.0));
+		cout << this->pos_x << endl;
+		this->pos_y = this->pos_y + ((dy / abstand) * 8.0);
+	}
+	void draw()
 	{
-		this->rel_pos_x = (this->pos_x - Fenster_x / 2);
-		this->rel_pos_y = (this->pos_y - Fenster_y / 2);
+		Bild.draw_rot(this->pos_x, this->pos_y, 0.0, rot, 0.5, 0.5);
 
 	}
 
+
 };
 
-class Earth  {
 
-	Gosu::Image Erde;
+
+class Erde : public Objekt  {
+
+	Gosu::Image Bild;
 
 public:
 	
-	Earth() :Erde("Erde.png") {
+	Erde(int x, int y, Objekt* oz, Gosu::Image B): Objekt(x,y,oz,B)  {
 
 	}
 	
 	int pos_x = Fenster_x / 2;
 	int pos_y = Fenster_y / 2;
-	void draw_erde()
-	{	
-		Erde.draw_rot(this->pos_x, this->pos_y, 0.0, Zeit * rot_geschwindigkeit, 0.5, 0.5);
-
-	}
+	
 };
+
+
 
 
 class Raumschiff : public Objekt {
 public:
-	int Geschwindigkeit;
-	double rotation;
-	double rotation_berechnen() {
-		return(this->rotation = atan(unsigned (this->rel_pos_x) / unsigned (this->rel_pos_y)));
-		if (this->rel_pos_y < 0 && this->rel_pos_x >0)
-		{
-			this->rotation += 90;
-		}
-		else if (this->rel_pos_x < 0 && this->rel_pos_y < 0)
-		{
-			this->rotation += 180;
-		}
-		else if (this->rel_pos_x < 0 && this->rel_pos_y > 0)
-		{
-			this->rotation += 190;
-		}
-
-	}
-	double Bewegung() {
-		
-	}
-
+	Raumschiff(double x, double y, Objekt* oz, Gosu::Image B) : Objekt(x, y, oz, B) { }
 };
+	
 
 class GameWindow : public Gosu::Window
 {
 public:
-	Gosu::Image Raumschiff;
-
-	Earth erde;
-	GameWindow()
-		: Window(Fenster_x, Fenster_y),
-		Raumschiff("rakete.png")
+	Gosu::Image Bild_Raumschiff;
+	
+	Raumschiff test1;
+	Raumschiff test2;
+	GameWindow() : Window(Fenster_x, Fenster_y), Bild_Raumschiff("rakete.png"), test1(800, 40, &test2, Bild_Raumschiff), test2(30, 120, &test1, Bild_Raumschiff)
 	{
 		set_caption("Earth");
 	}
-	int x = 0;
+
+	
 	// wird bis zu 60x pro Sekunde aufgerufen.
 	// Wenn die Grafikkarte oder der Prozessor nicht mehr hinterherkommen,
 	// dann werden `draw` Aufrufe ausgelassen und die Framerate sinkt
 	void draw() override
 	{
-		erde.draw_erde();
+		test1.draw();
+		test2.draw();
 	}
+
+
 
 	// Wird 60x pro Sekunde aufgerufen
 	void update() override
 	{
-		x += 1;
-		if (input().down(Gosu::MS_LEFT)) {
-		
-		}
+		test1.rot_berechnen();
+		test1.abstand_berechnen();
+		test1.bewegung();
+		test2.rot_berechnen();
+		test2.abstand_berechnen();
+		test2.bewegung();
+		//****************************************start
+	
+		//****************************************end
 	}
 };
 
