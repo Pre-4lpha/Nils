@@ -29,6 +29,7 @@ public:
 	double dy;
 	double dx;
 	double abstand;
+	int v; // Geschwindigkeit
 
 	void abstand_berechnen() {
 		 dy = ( this->Target_Objekt_Ptr->pos_y- this->pos_y);
@@ -46,9 +47,9 @@ public:
 	};
 	void bewegung() {
 		
-		this->pos_x = (this->pos_x + ((dx / abstand) * 8.0));
+		this->pos_x = (this->pos_x + ((dx / abstand) * v));
 		cout << this->pos_x << endl;
-		this->pos_y = this->pos_y + ((dy / abstand) * 8.0);
+		this->pos_y = this->pos_y + ((dy / abstand) * v);
 	}
 	void draw()
 	{
@@ -62,18 +63,14 @@ public:
 
 
 class Erde : public Objekt  {
-
-	Gosu::Image Bild;
-
 public:
-	
-	Erde(int x, int y, Objekt* oz, Gosu::Image B): Objekt(x,y,oz,B)  {
+	Erde(double x, double y, Objekt* oz, Gosu::Image B) : Objekt(x, y, oz, B) { }
+	void rot_berechnen(){
+		this->rot += v;
+		
 
 	}
-	
-	int pos_x = Fenster_x / 2;
-	int pos_y = Fenster_y / 2;
-	
+	double v = 0.1;
 };
 
 
@@ -82,6 +79,8 @@ public:
 class Raumschiff : public Objekt {
 public:
 	Raumschiff(double x, double y, Objekt* oz, Gosu::Image B) : Objekt(x, y, oz, B) { }
+	int Leben;
+	int v = 2;
 };
 	
 
@@ -89,11 +88,10 @@ class GameWindow : public Gosu::Window
 {
 public:
 	Gosu::Image Bild_Raumschiff;
+	Gosu::Image Bild_Erde;
+	Erde Erde;
 	
-	Raumschiff test1;
-	Raumschiff test2;
-	GameWindow() : Window(Fenster_x, Fenster_y), Bild_Raumschiff("rakete.png"), test1(800, 40, &test2, Bild_Raumschiff), test2(30, 120, &test1, Bild_Raumschiff)
-	{
+	GameWindow() : Window(Fenster_x, Fenster_y), Bild_Raumschiff("rakete.png"), Bild_Erde("Erde.png"), Erde(Fenster_x / 2, Fenster_y / 2, nullptr, Bild_Erde) {
 		set_caption("Earth");
 	}
 
@@ -103,8 +101,7 @@ public:
 	// dann werden `draw` Aufrufe ausgelassen und die Framerate sinkt
 	void draw() override
 	{
-		test1.draw();
-		test2.draw();
+		Erde.draw();
 	}
 
 
@@ -112,12 +109,7 @@ public:
 	// Wird 60x pro Sekunde aufgerufen
 	void update() override
 	{
-		test1.rot_berechnen();
-		test1.abstand_berechnen();
-		test1.bewegung();
-		test2.rot_berechnen();
-		test2.abstand_berechnen();
-		test2.bewegung();
+		Erde.rot_berechnen();
 		//****************************************start
 	
 		//****************************************end
