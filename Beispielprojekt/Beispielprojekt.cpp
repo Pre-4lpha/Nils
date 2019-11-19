@@ -34,7 +34,7 @@ public:
 	double abstand;
 	int v; // Geschwindigkeit
 
-	void abstand_berechnen() {
+	virtual void abstand_berechnen() {
 		 dy = ( this->Target_Objekt_Ptr->pos_y- this->pos_y);
 		if (dy == 0)
 			dy += 0.01;
@@ -45,30 +45,38 @@ public:
 		
 
 	};
-	void rot_berechnen() {	
+	virtual void rot_berechnen() {	
 	this->rot=Gosu::angle(this->pos_x, this->pos_y, this->Target_Objekt_Ptr->pos_x, this->Target_Objekt_Ptr->pos_y, 0);
 	};
-	void bewegung() {
+	virtual void bewegung() {
 		
 		this->pos_x = (this->pos_x + ((dx / abstand) * v));
 		cout << this->pos_x << endl;
 		this->pos_y = this->pos_y + ((dy / abstand) * v);
 	}
-	void draw()
+	virtual void draw()
 	{
 		Bild.draw_rot(this->pos_x, this->pos_y, 0.0, rot, 0.5, 0.5);
 
 	}
-	void update() {
-		rot_berechnen;
-		abstand_berechnen;
-		bewegung;
-	}
+
 
 
 };
 
-list<Raumschiff> Raumschiff_Liste;
+class Raumschiff : public Objekt {
+public:
+	Raumschiff(double x, double y, Objekt* oz, Gosu::Image B, list<Raumschiff> l) : Objekt(x, y, oz, B), liste(l) { }
+	int Leben;
+	int v = 2;
+	int Ort = 0;
+	list<Raumschiff> liste;
+	void angriff(list<Raumschiff>::iterator i) {
+	liste.erase(i);
+	}
+};
+
+
 
 
 void Wellen_Funktion(list<Raumschiff> liste, int Welle,Raumschiff T1,Raumschiff T2, Raumschiff T3) {
@@ -108,7 +116,12 @@ void Wellen_Funktion(list<Raumschiff> liste, int Welle,Raumschiff T1,Raumschiff 
 void Update_Raumschiff(list<Raumschiff> liste) {
 	for (list<Raumschiff>::iterator i = liste.begin(); i != liste.end(); i++)
 	{
-		*i->update;
+		i->abstand_berechnen();
+		i->rot_berechnen();
+		i->bewegung();
+		i->angriff(i);
+
+		
 	}
 }
 
@@ -136,24 +149,7 @@ public:
 
 
 
-class Raumschiff : public Objekt {
-public:
-	Raumschiff(double x, double y, Objekt* oz, Gosu::Image B) : Objekt(x, y, oz, B) { }
-	int Leben;
-	int v = 2;
-	int Ort = 0;
-	void angriff() {
-		if (this->abstand <= 100) {
-			Raumschiff_Liste.erase.at(Ort);
-	}
-	}
-	void update() {
-		this->rot_berechnen;
-		this->abstand_berechnen;
-		this->bewegung;
-		this->angriff;
-	}
-};
+
 	
 
 class GameWindow : public Gosu::Window
@@ -165,8 +161,9 @@ public:
 	Raumschiff Typ1;
 	Raumschiff Typ2;
 	Raumschiff Typ3;
+	list<Raumschiff> Raumschiff_Liste;
 	
-	GameWindow() : Window(Fenster_x, Fenster_y), Bild_Raumschiff("rakete.png"), Bild_Erde("Erde.png"), Erde(Fenster_x / 2, Fenster_y / 2, nullptr, Bild_Erde), Typ1(500, 0, &Erde, Bild_Raumschiff), Typ2(600, 0, &Erde, Bild_Raumschiff), Typ3(700, 0, &Erde, Bild_Raumschiff) {
+	GameWindow() : Window(Fenster_x, Fenster_y), Bild_Raumschiff("rakete.png"), Bild_Erde("Erde.png"), Erde(Fenster_x / 2, Fenster_y / 2, nullptr, Bild_Erde), Typ1(500, 0, &Erde, Bild_Raumschiff,Raumschiff_Liste), Typ2(600, 0, &Erde, Bild_Raumschiff,Raumschiff_Liste), Typ3(700, 0, &Erde, Bild_Raumschiff, Raumschiff_Liste) {
 		set_caption("Earth");
 	}
 
