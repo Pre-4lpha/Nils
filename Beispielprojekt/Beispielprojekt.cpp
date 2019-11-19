@@ -72,7 +72,7 @@ public:
 	int Ort = 0;
 	list<Raumschiff> liste;
 	void angriff(list<Raumschiff>::iterator i) {
-	liste.erase(i);
+	i = liste.erase(i);
 	}
 };
 
@@ -130,7 +130,7 @@ void Wellen_Update(int Welle, double Zeit, list<Raumschiff> liste,Raumschiff T1,
 	if (Zeit == 60) {
 		Welle += 1;
 		Zeit -= 60;
-		neue_welle = true;
+		Wellen_Funktion(liste, Welle, T1, T2, T3);
 
 	}
 }
