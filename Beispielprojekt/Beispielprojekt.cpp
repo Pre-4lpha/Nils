@@ -14,7 +14,7 @@ using namespace std;
 int Fenster_x = 1920;
 int Fenster_y = 1080;
 double rot_geschwindigkeit = 0.2;
-int Welle = 50;
+int Welle = 0;
 int durchlauf = 0;
 //*************************************start
 
@@ -65,13 +65,20 @@ public:
 
 class Raumschiff : public Objekt {
 public:
-	Raumschiff(double x, double y, Objekt* oz, Gosu::Image B, double G, double v) : Objekt(x, y, oz, B,v) { }
+	Raumschiff(double x, double y, Objekt* oz, Gosu::Image B, double v) : Objekt(x, y, oz, B,v) { }
 	int Leben;
 	int Ort = 0;
 	void draw()
 	{
 		Bild.draw_rot(this->pos_x, this->pos_y, 0.0, this->rot, 0.5, 0.5,0.05,0.05);
 
+	}
+};
+class Rakete : public Objekt {
+public:
+	Rakete(double x, double y, Objekt* oz, Gosu::Image B, double v) : Objekt(x, y, oz, B, v) { }
+	void Ziel_Update(list<Raumschiff> liste) {
+		list
 	}
 };
 
@@ -141,13 +148,20 @@ void Update_Raumschiff(list<Raumschiff> &liste) {
 	}
 }
 
+
+
 void Wellen_Update(int &Welle, double &Zeit, list<Raumschiff> &liste,Raumschiff &T1, Raumschiff &T2, Raumschiff &T3){
 	Zeit = 1.0/60.0 + Zeit ;
-	if (Zeit >= 1.0) {
+	if (Zeit >= 15.0) {
 		Welle += 1;
 		Zeit = 0;
 		Wellen_Funktion(liste, Welle, T1, T2, T3);
 
+	}
+	else if (liste.size() == 0) {
+		Welle += 1;
+		Zeit = 0;
+		Wellen_Funktion(liste, Welle, T1, T2, T3);
 	}
 }
 void Update_Raumschiff_draw(list<Raumschiff> &liste) {
@@ -158,9 +172,24 @@ void Update_Raumschiff_draw(list<Raumschiff> &liste) {
 	}
 }
 
+void Update_Rakete_draw(list<Rakete> &liste) {
+	list<Rakete>::iterator i = liste.begin();
+	while (i != liste.end()) {
+		i->draw();
+		i++;
+	}
+}
+
+void Rakete_Update(double &Zeit, list<Rakete> &liste, Rakete R) {
+	if(Zeit >= 4)
+	{
+		liste.push_back(R);
+	}
+}
+
 class Erde : public Objekt  {
 public:
-	Erde(double x, double y, Objekt* oz, Gosu::Image B,double v) : Objekt(x, y, oz, B), v(v) { }
+	Erde(double x, double y, Objekt* oz, Gosu::Image B,double v) : Objekt(x, y, oz, B, v) { }
 	void rot_berechnen(){
 		this->rot += v;
 		
@@ -186,7 +215,7 @@ public:
 	Gosu::Image Bild_Raumschiff1;
 	Gosu::Image Bild_Raumschiff2;
 	Gosu::Image Bild_Raumschiff3;
-
+	Gosu::Image Bild_Rakete;
 	Gosu::Image Bild_Erde;
 	Erde Erde;
 	Raumschiff Typ1;
@@ -194,6 +223,8 @@ public:
 	Raumschiff Typ3;
 	list<Raumschiff> Raumschiff_Liste;
 	double Zeit = 57;
+	list<Rakete> Raketen_Liste;
+	Rakete Rakete;
 	
 	GameWindow()
 		: Window(Fenster_x, Fenster_y),
@@ -201,11 +232,13 @@ public:
 		Bild_Raumschiff2("R2.png"),
 		Bild_Raumschiff3("R3.png"),
 		Bild_Erde("Erde.png"),
+		Bild_Rakete("rakete.png"),
 		Erde(Fenster_x / 2, Fenster_y / 2, nullptr, Bild_Erde, 0.2),
-		Typ1(500, 0, &Erde, Bild_Raumschiff1,50),
-		Typ2(600, 0, &Erde, Bild_Raumschiff2,100),
-		Typ3(700, 0, &Erde, Bild_Raumschiff3,5) {
+		Typ1(500, 0, &Erde, Bild_Raumschiff1,1),
+		Typ2(600, 0, &Erde, Bild_Raumschiff2,2.5),
+		Typ3(700, 0, &Erde, Bild_Raumschiff3,0.5), Rakete(Fenster_x/2+50,Fenster_y/2-67,Raumschiff_Liste.begin(),Bild_Rakete,20) {
 		set_caption("Earth");
+
 	}
 
 	
@@ -216,6 +249,7 @@ public:
 	{
 		Erde.draw();
 		Update_Raumschiff_draw(Raumschiff_Liste);
+		Update_Rakete_draw(Raketen_Liste);
 	}
 
 
@@ -226,6 +260,7 @@ public:
 		Wellen_Update(Welle, Zeit, Raumschiff_Liste, Typ1, Typ2, Typ3);
 		Update_Raumschiff(Raumschiff_Liste);
 		Erde.rot_berechnen();
+		Rakete_Update(Zeit, Raketen_Liste, Rakete);
 
 		//****************************************start
 	
