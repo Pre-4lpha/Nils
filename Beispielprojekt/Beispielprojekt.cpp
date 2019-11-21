@@ -65,12 +65,8 @@ public:
 
 class Raumschiff : public Objekt {
 public:
-	Raumschiff(double x, double y, Objekt* oz, Gosu::Image B, double G) : Objekt(x, y, oz, B), Geschwindigkeit(G) { }
+	Raumschiff(double x, double y, Objekt* oz, Gosu::Image B, double G, double v) : Objekt(x, y, oz, B,v) { }
 	int Leben;
-	double Geschwindigkeit;
-	void Geschwindigkeit_Methode (){
-		this->v = Geschwindigkeit;
-	}
 	int Ort = 0;
 	void draw()
 	{
@@ -105,22 +101,22 @@ void Wellen_Funktion(list<Raumschiff>& liste, int Welle,Raumschiff &T1,Raumschif
 	for (int Wellen_Groeﬂe = Welle; Wellen_Groeﬂe > (Welle - Anzahl_Typ3); Wellen_Groeﬂe--) {
 		liste.push_back(T3);
 		cout << "test3" << endl;
-		T3.pos_x = Fenster_x/2+(-700 * cos((360.0 / Anzahl_Typ3)*durchlauf));
-		T3.pos_y = Fenster_y/2 +( 700 * sin((360.0 / Anzahl_Typ3)*durchlauf));
+		T3.pos_x = Fenster_x/2+(-1400 * cos((360.0 / Anzahl_Typ3)*durchlauf));
+		T3.pos_y = Fenster_y/2 +( 1400 * sin((360.0 / Anzahl_Typ3)*durchlauf));
 		durchlauf += 1;
 	}
 	for (int Wellen_Groeﬂe = Welle; Wellen_Groeﬂe > (Welle - Anzahl_Typ3-Anzahl_Typ2); Wellen_Groeﬂe--) {
 		liste.push_back(T2);
 		cout << "test2" <<endl;
-		T2.pos_x = Fenster_x/2 + (600 * cos((360.0 / Anzahl_Typ2)*durchlauf));
-		T2.pos_y = Fenster_y/2 + (-600 * sin((360.0 / Anzahl_Typ2)*durchlauf));
+		T2.pos_x = Fenster_x/2 + (1200 * cos((360.0 / Anzahl_Typ2)*durchlauf));
+		T2.pos_y = Fenster_y/2 + (-1200 * sin((360.0 / Anzahl_Typ2)*durchlauf));
 		durchlauf += 1;
 	}
 	for (int Wellen_Groeﬂe = Welle; Wellen_Groeﬂe > (Welle - Anzahl_Typ1); Wellen_Groeﬂe--) {
 		liste.push_back(T1);
 		cout << "test1" << endl;
-		T1.pos_x = Fenster_x/2 +( -500 * sin((360.0 / double(Anzahl_Typ1))*durchlauf));
-		T1.pos_y = Fenster_y/2 + (500 * cos((360.0 / double(Anzahl_Typ1))*durchlauf));
+		T1.pos_x = Fenster_x/2 +( -1200 * sin((360.0 / double(Anzahl_Typ1))*durchlauf));
+		T1.pos_y = Fenster_y/2 + (1200 * cos((360.0 / double(Anzahl_Typ1))*durchlauf));
 		durchlauf += 1;
 	}
 
