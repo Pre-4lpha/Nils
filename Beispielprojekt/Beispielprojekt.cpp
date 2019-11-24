@@ -236,7 +236,7 @@ public:
 		Erde(Fenster_x / 2, Fenster_y / 2, nullptr, Bild_Erde, 0.2),
 		Typ1(500, 0, &Erde, Bild_Raumschiff1,1),
 		Typ2(600, 0, &Erde, Bild_Raumschiff2,2.5),
-		Typ3(700, 0, &Erde, Bild_Raumschiff3,0.5), Rakete(Fenster_x/2+50,Fenster_y/2-67,Raumschiff_Liste.begin(),Bild_Rakete,20) {
+		Typ3(700, 0, &Erde, Bild_Raumschiff3,0.5), Rakete((Fenster_x/2+50),(Fenster_y/2-67),(Raumschiff_Liste->next),(Bild_Rakete),(20)) {
 		set_caption("Earth");
 
 	}
