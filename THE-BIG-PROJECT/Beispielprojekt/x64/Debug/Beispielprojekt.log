@@ -1,0 +1,15 @@
+﻿  stdafx.cpp
+  Vektor2d.cpp
+  Planet.cpp
+  Beispielprojekt.cpp
+c:\users\hilger.nils\desktop\the-big-project\beispielprojekt\beispielprojekt.cpp(190): warning C4244: "Argument": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\users\hilger.nils\desktop\the-big-project\beispielprojekt\beispielprojekt.cpp(192): warning C4244: "Argument": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\users\hilger.nils\desktop\the-big-project\beispielprojekt\beispielprojekt.cpp(193): warning C4244: "Argument": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\users\hilger.nils\desktop\the-big-project\beispielprojekt\beispielprojekt.cpp(194): warning C4244: "Argument": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\users\hilger.nils\desktop\the-big-project\beispielprojekt\beispielprojekt.cpp(195): warning C4244: "Argument": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\users\hilger.nils\desktop\the-big-project\beispielprojekt\beispielprojekt.cpp(197): warning C4244: "Argument": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\users\hilger.nils\desktop\the-big-project\beispielprojekt\beispielprojekt.cpp(198): warning C4244: "Argument": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\users\hilger.nils\desktop\the-big-project\beispielprojekt\beispielprojekt.cpp(417): warning C4244: "=": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\users\hilger.nils\desktop\the-big-project\beispielprojekt\beispielprojekt.cpp(418): warning C4244: "=": Konvertierung von "double" in "int", möglicher Datenverlust
+  Code wird generiert...
+  Beispielprojekt.vcxproj -> C:\Users\hilger.nils\Desktop\THE-BIG-PROJECT\x64\Debug\Beispielprojekt.exe
