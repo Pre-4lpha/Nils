@@ -15,7 +15,7 @@ using namespace std;
 int Fenster_x = 1920;
 int Fenster_y = 1080;
 double rot_geschwindigkeit = 0.2;
-int Welle = 20;
+int Welle = 0;
 double PI = 3.1415962;
 string stringgeld = "Geld: ";
 string Nachricht = "";		//diesen string kannst du bei bedarf umbenennen, er wird rechts unten ausgegeben für nachrichten an spieler
@@ -284,7 +284,7 @@ void Update_Rakete(list<Rakete> &liste) {
 
 void Wellen_Update(int &Welle, double &Zeit, list<shared_ptr<Raumschiff>> &liste,Raumschiff &T1, Raumschiff &T2, Raumschiff &T3){
 	Zeit = 1.0/60.0 + Zeit ;
-	if (Zeit >= 15.0) {
+	if (Zeit >= 20.0) {
 		Welle += 1;
 		Zeit = 0;
 		Wellen_Funktion(liste, Welle, T1, T2, T3);
@@ -373,7 +373,8 @@ void Laser_Schaden(list<shared_ptr<Raumschiff>> &liste, list<Rakete> &liste_Rake
 		double dy = (*i)->pos_y - Laser.pos_y;
 		double abstand = sqrt((dx*dx) + (dy*dy));
 		if (abstand <= min_abstand) {
-			if (rot+0.1 ==(*i)->rot)
+			cout << rot << "/n" << (*i)->rot << endl;
+			if (rot ==(*i)->rot)
 			{
 				(*i)->Leben -= Laser.Schaden;
 			}
