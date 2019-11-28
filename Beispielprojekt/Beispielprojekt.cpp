@@ -15,7 +15,7 @@ using namespace std;
 int Fenster_x = 1920;
 int Fenster_y = 1080;
 double rot_geschwindigkeit = 0.2;
-int Welle = 0;
+int Welle = 20;
 double PI = 3.1415962;
 string stringgeld = "Geld: ";
 string Nachricht = "";		//diesen string kannst du bei bedarf umbenennen, er wird rechts unten ausgegeben für nachrichten an spieler
@@ -106,6 +106,7 @@ public:
 
 };
 
+
 class Asteroid : public Objekt {
 public:
 	int radius;
@@ -124,6 +125,10 @@ public:
 	void rot_berechnen()
 	{
 		this->rot += v;
+		if (this->rot >=360)
+		{
+			this->rot = 0;
+		}
 	}
 	void draw()
 	{
@@ -149,6 +154,17 @@ public:
 		Bild.draw_rot(this->pos_x, this->pos_y, 0.0, this->rot, 0.5, 0.5, 0.3, 0.3);
 	}
 };
+
+class Laser : public Erde {
+public:
+	Laser(double x, double y, Objekt* oz, Gosu::Image B, double v, int L, int S) : Erde(x, y, oz, B, v, L), Schaden(S) { };
+	void draw()
+	{
+		Bild.draw_rot(this->pos_x, this->pos_y, -0.1, this->rot, 0, 0.5, 0.8, 0.02);
+	}
+	int Schaden;
+};
+
 
 void Zeiger_Update(list<Rakete> &liste, list<shared_ptr<Raumschiff>> &liste_Raumschiff, Raumschiff& i_raumschiff) {
 	list<Rakete>::iterator i = liste.begin();
@@ -221,7 +237,6 @@ void Wellen_Funktion(list<shared_ptr<Raumschiff>>& liste, int Welle,Raumschiff &
 
 void Update_Raumschiff(list<shared_ptr<Raumschiff>> &liste,list<Rakete> &liste_Rakete) {
 	auto i = liste.begin();
-	cout << "Start Update Rau,schiff" << endl;
 	while(i != liste.end())
 	{
 		(*i)->abstand_berechnen();
@@ -339,6 +354,33 @@ void draw_maus(int x,int y, list<shared_ptr<Raumschiff>> & liste, Gosu::Image Bi
 	}
 }
 
+void Laser_Schaden(list<shared_ptr<Raumschiff>> &liste, list<Rakete> &liste_Rakete, Laser Laser) {
+	auto i = liste.begin();
+	double min_abstand = 700;
+	double rot = Laser.rot;
+	rot += 270;
+	if (rot >= 360.0)
+	{
+		rot -= 360.0;
+	}
+	if (rot <= 0)
+	{
+		rot += 360.0;
+	}
+
+	while (i != liste.end()) {
+		double dx = (*i)->pos_x - Laser.pos_x;
+		double dy = (*i)->pos_y - Laser.pos_y;
+		double abstand = sqrt((dx*dx) + (dy*dy));
+		if (abstand <= min_abstand) {
+			if ((rot-1 <=(*i)->rot)||((*i)->rot) <= rot+1 )
+			{
+				(*i)->Leben -= Laser.Schaden;
+			}
+		}
+		i++;
+	}
+}
 
 
 
@@ -364,9 +406,11 @@ public:
 	Gosu::Image pfeil;
 	Gosu::Image Ring_lila;
 	Gosu::Image Ring_gelb;
+	Gosu::Image Bild_Laser;
 	Gosu::Font testfont;
 
 	Erde Erde;
+	Laser Laser;
 	Raumschiff Typ1;
 	Raumschiff Typ2;
 	Raumschiff Typ3;
@@ -409,6 +453,9 @@ public:
 		Ring_lila("Ring_lila.png"),
 		Ring_gelb("Ring_gelb.png"),
 		rahmen("rahmen.png"),
+		Bild_Laser("Laser.png"),
+
+		Laser(Fenster_x / 2, Fenster_y / 2, nullptr, Bild_Laser,1,10,2),
 
 		Raumstation_1(0.0, 0.0, nullptr, Raumstation, 0,0),
 		Raumstation_2(0.0, 0.0, nullptr, Raumstation, 0,0),
@@ -423,6 +470,7 @@ public:
 		ast8(900, 900, nullptr, Asteroid_2, 0.08,0, 7, 80.0, Asteroid_2_full, 0),
 		ast9(900, 900, nullptr, Asteroid_1, 0.009,0, 7.9, 90.0, Asteroid_1_full, 0),
 		ast10(900, 900, nullptr, Asteroid_2, 0.1,0, 7.3, 100.0, Asteroid_2_full, 0),
+
 
 		testfont(20) {}
 
@@ -521,6 +569,7 @@ public:
 	void draw() override
 	{
 		Erde.draw();
+		Laser.draw();
 		Update_Raumschiff_draw(Raumschiff_Liste);
 		Update_Rakete_draw(Raketen_Liste);
 		Vordergrund();
@@ -542,6 +591,9 @@ public:
 			if(bool_ziel == true)
 			Raketen_Funktion(Raketen_Liste, Rakete, Check_Maus(x_maus, y_maus, Raumschiff_Liste));
 		}
+		Laser.rot_berechnen();
+		Laser_Schaden(Raumschiff_Liste, Raketen_Liste, Laser);
+
 	}
 };
 
