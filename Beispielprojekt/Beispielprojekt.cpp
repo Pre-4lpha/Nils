@@ -373,7 +373,7 @@ void Laser_Schaden(list<shared_ptr<Raumschiff>> &liste, list<Rakete> &liste_Rake
 		double dy = (*i)->pos_y - Laser.pos_y;
 		double abstand = sqrt((dx*dx) + (dy*dy));
 		if (abstand <= min_abstand) {
-			if ((rot-1 <=(*i)->rot)||((*i)->rot) <= rot+1 )
+			if (rot+0.1 ==(*i)->rot)
 			{
 				(*i)->Leben -= Laser.Schaden;
 			}
@@ -488,14 +488,6 @@ public:
 		Platzhalter.draw(1660.0, 250.0, 0.0, 0.1, 0.1);
 		testfont.draw("Satan      700$", 1730.0, 250.0, 0.0, 1.0, 1.0, Gosu::Color::WHITE);
 		Ernter.draw(1660.0, 310.0, 0.0, 0.165, 0.165);
-		if (Anzahl_Ernter <= 10)
-		{
-			testfont.draw("Miner	  300$", 1730.0, 310.0, 0.0, 1.0, 1.0, Gosu::Color::WHITE);
-		}
-		else
-		{
-			testfont.draw("all Miners used", 1730.0, 310.0, 0.0, 1.0, 1.0, Gosu::Color::RED);
-		}
 		Raumstation_rahmen.draw(1660.0, 370.0, 0.0, 0.1, 0.1);
 		testfont.draw("Satellit  1000$", 1730.0, 370.0, 0.0, 1.0, 1.0, Gosu::Color::WHITE);
 
@@ -588,6 +580,7 @@ public:
 		x_maus = input().mouse_x();
 		y_maus = input().mouse_y();
 		if (Toggle_Maus_Links() == true) {
+			Check_Maus(x_maus, y_maus, Raumschiff_Liste);
 			if(bool_ziel == true)
 			Raketen_Funktion(Raketen_Liste, Rakete, Check_Maus(x_maus, y_maus, Raumschiff_Liste));
 		}
