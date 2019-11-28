@@ -159,13 +159,9 @@ public:
 };
 class Rakete : public Objekt {
 public:
-	Rakete(double x, double y, Objekt* oz, Gosu::Image B, double v, int L, int S, Erde E) : Objekt(x, y, oz, B, v, L), Schaden(S), E(E) { }
+	Rakete(double x, double y, Objekt* oz, Gosu::Image B, double v, int L, int S, double r) : Objekt(x, y, oz, B, v, L), Schaden(S), rot(r) { }
 	int Schaden;
-	double start_rot = E.rot;
-	Erde E;
-	void rot_anfang() {
-		this->rot = start_rot;
-	}
+	double rot;
 	void draw()
 	{
 		Bild.draw_rot(this->pos_x, this->pos_y, 0.0, this->rot, 0, 0, 0.5, 0.5);
@@ -173,17 +169,20 @@ public:
 	}
 	void rot_berechnen() {
 		double temp_rot = Gosu::angle(this->pos_x, this->pos_y, this->Target_Objekt_Ptr->pos_x, this->Target_Objekt_Ptr->pos_y, 0);
+		if (360 <= temp_rot + (180-rot)) {
+			temp_rot -= 360;
+		}
 		if (this->rot <= temp_rot) {
-			if ((temp_rot - this->rot) > 2) {
-				this->rot += 2;
+			if ((temp_rot - this->rot) > 3) {
+				this->rot += 3;
 			}
 			else {
 				this->rot = temp_rot;
 			}
 		}
 		else {
-			if ((this->rot - temp_rot) > 2) {
-				this->rot -= 2;
+			if ((this->rot - temp_rot) > 3) {
+				this->rot -= 3;
 			}
 			else {
 				this->rot = temp_rot;
@@ -208,17 +207,17 @@ void Zeiger_Update(list<Rakete> &liste, list<shared_ptr<Raumschiff>> &liste_Raum
 			}
 			if (i->Target_Objekt_Ptr == &E)
 			{
-				i->Target_Objekt_Ptr = &*liste_Raumschiff.front();
+				i->Target_Objekt_Ptr = &*liste_Raumschiff.back();
 			}
 			else if (i->Target_Objekt_Ptr == &i_raumschiff)
 			{	
-				if (i->Target_Objekt_Ptr == &*liste_Raumschiff.front())
+				if (i->Target_Objekt_Ptr == &*liste_Raumschiff.back())
 				{
 					i->Target_Objekt_Ptr = &E;
 				}
 				else
 				{
-					i->Target_Objekt_Ptr = &*liste_Raumschiff.front();
+					i->Target_Objekt_Ptr = &*liste_Raumschiff.back();
 				}
 			}
 		
@@ -300,7 +299,7 @@ void Update_Rakete(list<Rakete> &liste) {
 		i->rot_berechnen();
 		i->abstand_berechnen();
 		i->bewegung();
-		if (i->abstand <= 15) {
+		if (i->abstand <= 30) {
 			i->Target_Objekt_Ptr->Leben -= i->Schaden;
 			cout << i->Target_Objekt_Ptr->Leben << endl;
 			i = liste.erase(i);
@@ -323,11 +322,11 @@ void Wellen_Update(int &Welle, double &Zeit, list<shared_ptr<Raumschiff>> &liste
 		Wellen_Funktion(liste, Welle, T1, T2, T3);
 
 	}
-	else if (liste.size() == 0) {
+	/*else if (liste.size() == 0) {
 		Welle += 1;
 		Zeit = 0;
 		Wellen_Funktion(liste, Welle, T1, T2, T3);
-	}
+	}*/
 }
 
 void Update_Raumschiff_draw(list<shared_ptr<Raumschiff>> &liste) {
@@ -347,7 +346,6 @@ void Update_Rakete_draw(list<Rakete> &liste) {
 }
 
 void Raketen_Funktion(list<Rakete> &liste, Rakete& Rakete, Raumschiff& Raumschiff) {
-		Rakete.rot_anfang();
 		Rakete.Target_Objekt_Ptr = &Raumschiff;
 		liste.push_back(Rakete);
 }
@@ -461,7 +459,7 @@ public:
 		Typ1(500, 0, &Erde, &Bild_Raumschiff1, 1, 2),
 		Typ2(600, 0, &Erde, &Bild_Raumschiff2, 2.5, 2),
 		Typ3(700, 0, &Erde, &Bild_Raumschiff3, 0.5, 6),
-		Rakete(Fenster_x/2.0, Fenster_y/2.0, nullptr, (Bild_Rakete), (5),2,2,Erde), 
+		Rakete(Fenster_x/2.0, Fenster_y/2.0, nullptr, (Bild_Rakete), (10),2,2,Erde.rot), 
 		Ernter("Ernter.png"),
 		Raumstation("Raumstation.png"),
 		Raumstation_rahmen("Raumstation_rahmen.png"),
@@ -476,7 +474,7 @@ public:
 		rahmen("rahmen.png"),
 		Bild_Laser("Laser.png"),
 
-		Laser(Fenster_x / 2, Fenster_y / 2, nullptr, Bild_Laser,1,10,2),
+		Laser(Fenster_x / 2, Fenster_y / 2, nullptr, Bild_Laser,0.2,10,2),
 
 		Raumstation_1(0.0, 0.0, nullptr, Raumstation, 0,0),
 		Raumstation_2(0.0, 0.0, nullptr, Raumstation, 0,0),
