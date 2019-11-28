@@ -3,6 +3,7 @@
 #include <Gosu/Gosu.hpp>
 #include <Gosu/AutoLink.hpp>
 
+#include <memory>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -14,7 +15,7 @@ using namespace std;
 int Fenster_x = 1920;
 int Fenster_y = 1080;
 double rot_geschwindigkeit = 0.2;
-int Welle = 120;
+int Welle = 0;
 double PI = 3.1415962;
 string stringgeld = "Geld: ";
 string Nachricht = "";		//diesen string kannst du bei bedarf umbenennen, er wird rechts unten ausgegeben für nachrichten an spieler
@@ -149,7 +150,7 @@ public:
 	}
 };
 
-void Zeiger_Update(list<Rakete> &liste, list<Raumschiff> &liste_Raumschiff, list<Raumschiff>::iterator i_raumschiff) {
+void Zeiger_Update(list<Rakete> &liste, list<shared_ptr<Raumschiff>> &liste_Raumschiff, Raumschiff& i_raumschiff) {
 	list<Rakete>::iterator i = liste.begin();
 	while (i != liste.end())
 	{
@@ -157,16 +158,18 @@ void Zeiger_Update(list<Rakete> &liste, list<Raumschiff> &liste_Raumschiff, list
 			if (liste_Raumschiff.size() == 0)
 			{
 				i = liste.erase(i);
+				continue;
 			}
-			else if (i->Target_Objekt_Ptr == &*i_raumschiff)
+			else if (i->Target_Objekt_Ptr == &i_raumschiff)
 			{
-				if (i->Target_Objekt_Ptr == &liste_Raumschiff.front())
+				if (i->Target_Objekt_Ptr == &*liste_Raumschiff.front())
 				{
 					i = liste.erase(i);
+					continue;
 				}
 				else
 				{
-					i->Target_Objekt_Ptr = &liste_Raumschiff.front();
+					i->Target_Objekt_Ptr = &*liste_Raumschiff.front();
 				}
 			}
 		
@@ -176,7 +179,7 @@ void Zeiger_Update(list<Rakete> &liste, list<Raumschiff> &liste_Raumschiff, list
 	}
 }
 
-void Wellen_Funktion(list<Raumschiff>& liste, int Welle,Raumschiff &T1,Raumschiff &T2, Raumschiff &T3) {
+void Wellen_Funktion(list<shared_ptr<Raumschiff>>& liste, int Welle,Raumschiff &T1,Raumschiff &T2, Raumschiff &T3) {
 	int durchlauf = 1;
 	int Anzahl_Typ1 = Welle;
 	int Anzahl_Typ2 = 0;
@@ -194,14 +197,14 @@ void Wellen_Funktion(list<Raumschiff>& liste, int Welle,Raumschiff &T1,Raumschif
 	for (int Wellen_Groeße = Welle; Wellen_Groeße > (Welle - Anzahl_Typ3); Wellen_Groeße--) {
 		T3.pos_x = Fenster_x/2+(-1400 * (pow(1.05, durchlauf-Welle)) * cos(durchlauf*(2.0*PI/double (Anzahl_Typ3))));
 		T3.pos_y = Fenster_y/2 +( 1400 * (pow(1.05, durchlauf-Welle)) * sin(durchlauf*(2.0*PI / double (Anzahl_Typ3))));
-		liste.push_back(T3);
+		liste.push_back(make_shared<Raumschiff> (T3));
 		durchlauf += 1;
 	}
 	durchlauf = 1;
 	for (int Wellen_Groeße = Welle; Wellen_Groeße > (Welle - Anzahl_Typ3-Anzahl_Typ2); Wellen_Groeße--) {
 		T2.pos_x = Fenster_x/2 + (1200 * (pow(1.05, durchlauf)) * cos(durchlauf*(2.0*PI / double (Anzahl_Typ2))));
 		T2.pos_y = Fenster_y/2 + (-1200 * (pow(1.05, durchlauf)) * sin(durchlauf*(2.0*PI/ double(Anzahl_Typ2))));
-		liste.push_back(T2);
+		liste.push_back(make_shared<Raumschiff> (T2));
 		durchlauf += 1;
 	}
 	durchlauf = 1;
@@ -209,27 +212,27 @@ void Wellen_Funktion(list<Raumschiff>& liste, int Welle,Raumschiff &T1,Raumschif
 		T1.pos_x = Fenster_x/2 +( -1000*(pow(1.05,durchlauf)) * sin(durchlauf*(2.0*PI/ double(Anzahl_Typ1))));
 		cout << sin(durchlauf*(1.0 / double(Anzahl_Typ1))) << endl;
 		T1.pos_y = Fenster_y/2 + (1000 * (pow(1.05, durchlauf)) * cos(durchlauf*(2.0*PI/ double(Anzahl_Typ1))));
-		liste.push_back(T1);
+		liste.push_back(make_shared<Raumschiff> (T1));
 		durchlauf += 1;
 	}
 
 
 }
 
-void Update_Raumschiff(list<Raumschiff> &liste,list<Rakete> &liste_Rakete) {
-	list<Raumschiff>::iterator i = liste.begin();
+void Update_Raumschiff(list<shared_ptr<Raumschiff>> &liste,list<Rakete> &liste_Rakete) {
+	auto i = liste.begin();
 	cout << "Start Update Rau,schiff" << endl;
 	while(i != liste.end())
 	{
-		i->abstand_berechnen();
-		i->rot_berechnen();
-		i->bewegung();
-		if (i->Leben <= 0) {
-			Zeiger_Update(liste_Rakete, liste,i);
-			i = liste.erase(i);			
+		(*i)->abstand_berechnen();
+		(*i)->rot_berechnen();
+		(*i)->bewegung();
+		if ((*i)->Leben <= 0) {
+			Zeiger_Update(liste_Rakete, liste, **i);
+			i = liste.erase(i);
 		}
-		else if (i->abstand <= 100) {
-			Zeiger_Update(liste_Rakete, liste,i);
+		else if ((*i)->abstand <= 100) {
+			Zeiger_Update(liste_Rakete, liste,**i);
 		i = liste.erase(i);
 		}
 		else {
@@ -243,7 +246,7 @@ void Update_Raumschiff(list<Raumschiff> &liste,list<Rakete> &liste_Rakete) {
 
 
 void Update_Rakete(list<Rakete> &liste) {
-	list<Rakete>::iterator i = liste.begin();
+	auto i = liste.begin();
 	while (i != liste.end())
 	{
 		i->abstand_berechnen();
@@ -264,7 +267,7 @@ void Update_Rakete(list<Rakete> &liste) {
 
 
 
-void Wellen_Update(int &Welle, double &Zeit, list<Raumschiff> &liste,Raumschiff &T1, Raumschiff &T2, Raumschiff &T3){
+void Wellen_Update(int &Welle, double &Zeit, list<shared_ptr<Raumschiff>> &liste,Raumschiff &T1, Raumschiff &T2, Raumschiff &T3){
 	Zeit = 1.0/60.0 + Zeit ;
 	if (Zeit >= 15.0) {
 		Welle += 1;
@@ -279,16 +282,16 @@ void Wellen_Update(int &Welle, double &Zeit, list<Raumschiff> &liste,Raumschiff 
 	}
 }
 
-void Update_Raumschiff_draw(list<Raumschiff> &liste) {
-	list<Raumschiff>::iterator i = liste.begin();
+void Update_Raumschiff_draw(list<shared_ptr<Raumschiff>> &liste) {
+	auto i = liste.begin();
 	while (i != liste.end()) {
-		i->draw();
+		(*i)->draw();
 		i++;
 	}
 }
 
 void Update_Rakete_draw(list<Rakete> &liste) {
-	list<Rakete>::iterator i = liste.begin();
+	auto i = liste.begin();
 	while (i != liste.end()) {
 		i->draw();
 		i++;
@@ -305,23 +308,23 @@ void Raketen_Funktion(list<Rakete> &liste, Rakete& Rakete, Raumschiff& Raumschif
 }
 
 
-Raumschiff& Check_Maus(int x, int y, list<Raumschiff> & liste) {
+Raumschiff& Check_Maus(int x, int y, list<shared_ptr<Raumschiff>> & liste) {
 	//gibt Zeiger auf markiertes Raumschiff aus
 	int min_abstand = 100;
-	list<Raumschiff>::iterator Ziel;
-	list<Raumschiff>::iterator i = liste.begin();
+	shared_ptr<Raumschiff> Ziel;
+	auto i = liste.begin();
 	bool_ziel = false;
 	
 	while (i != liste.end()) {
 		{
-			double dx = i->pos_x - x;
-			double dy = i->pos_y - y;
+			double dx = (*i)->pos_x - x;
+			double dy = (*i)->pos_y - y;
 			double abstand = sqrt((dx*dx) + (dy*dy));
 			if (abstand < min_abstand)
 			{
 				min_abstand = abstand;
 				bool_ziel = true;
-				Ziel = i;
+				Ziel = *i;
 			}
 			i++;
 		}
@@ -329,10 +332,10 @@ Raumschiff& Check_Maus(int x, int y, list<Raumschiff> & liste) {
 	return *Ziel;
 }
 
-void draw_maus(int x,int y, list<Raumschiff> & liste, Gosu::Image Bild) {
+void draw_maus(int x,int y, list<shared_ptr<Raumschiff>> & liste, Gosu::Image Bild) {
 	Check_Maus(x, y, liste);
 	if (bool_ziel == true) {
-	Check_Maus(x, y, liste)->draw_markiert();		
+	Check_Maus(x, y, liste).draw_markiert();		
 	}
 }
 
@@ -367,7 +370,7 @@ public:
 	Raumschiff Typ1;
 	Raumschiff Typ2;
 	Raumschiff Typ3;
-	list<Raumschiff> Raumschiff_Liste;
+	list<shared_ptr<Raumschiff>> Raumschiff_Liste;
 	double Zeit = 15;
 	list<Rakete> Raketen_Liste;
 	Rakete Rakete;
