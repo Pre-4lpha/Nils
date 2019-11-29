@@ -219,24 +219,24 @@ Raumschiff& Check_Maus(int x, int y, list<shared_ptr<Raumschiff>>& liste, int mi
 	}
 	return *Ziel;
 }
-void Zeiger_Update(list<Rakete> &liste, list<shared_ptr<Raumschiff>> &liste_Raumschiff, Raumschiff& i_raumschiff,Raumschiff &E) {
+void Zeiger_Update(list<Rakete> &liste, list<shared_ptr<Raumschiff>> &liste_Raumschiff, Raumschiff& i_raumschiff,Raumschiff &Temp) {
 	list<Rakete>::iterator i = liste.begin();
 	while (i != liste.end())
 	{
 		
 			if (liste_Raumschiff.size() == 0)
 			{
-				i->Target_Objekt_Ptr = &E;
+				i->Target_Objekt_Ptr = &Temp;
 			}
-			else if (i->Target_Objekt_Ptr == &E)
+			else if (i->Target_Objekt_Ptr == &Temp)
 			{
 				i->Target_Objekt_Ptr = &Check_Maus(i->pos_y, i->pos_x, liste_Raumschiff,10000);
 			}
-			else if (i->Target_Objekt_Ptr == &i_raumschiff)
+			 if (i->Target_Objekt_Ptr == &i_raumschiff)
 			{					
 					 if (i->Target_Objekt_Ptr == &Check_Maus(i->pos_x, i->pos_y, liste_Raumschiff, 10000))
 					{
-						i->Target_Objekt_Ptr = &*liste_Raumschiff.front();
+						i->Target_Objekt_Ptr = &Temp;
 					}
 					else i->Target_Objekt_Ptr = &Check_Maus(i->pos_x, i->pos_y, liste_Raumschiff, 10000);
 			}			
@@ -428,6 +428,7 @@ public:
 	Raumschiff Typ1;
 	Raumschiff Typ2;
 	Raumschiff Typ3;
+	Raumschiff Temp;
 	list<shared_ptr<Raumschiff>> Raumschiff_Liste;
 	double Zeit = 15;
 	list<Rakete> Raketen_Liste;
@@ -454,6 +455,7 @@ public:
 		Typ1(500, 0, &Erde, &Bild_Raumschiff1, 1, 2),
 		Typ2(600, 0, &Erde, &Bild_Raumschiff2, 2.5, 2),
 		Typ3(700, 0, &Erde, &Bild_Raumschiff3, 0.5, 6),
+		Temp(Fenster_x/2, Fenster_y/2, nullptr, &Bild_Raumschiff1,0,0),
 		Rakete(Fenster_x/2.0, Fenster_y/2.0, nullptr, (Bild_Rakete), (10),2,2,Erde.rot), 
 		Ernter("Ernter.png"),
 		Raumstation("Raumstation.png"),
@@ -591,7 +593,7 @@ public:
 		Wellen_Update(Welle, Zeit, Raumschiff_Liste, Typ1, Typ2, Typ3);
 		Update_Raumschiff(Raumschiff_Liste, Raketen_Liste, Typ1);
 		Update_Rakete(Raketen_Liste);
-		Zeiger_Update(Raketen_Liste, Raumschiff_Liste, Typ1, Typ1);
+		Zeiger_Update(Raketen_Liste, Raumschiff_Liste, Temp, Temp);
 		Erde.rot_berechnen();
 		x_maus = input().mouse_x();
 		y_maus = input().mouse_y();
