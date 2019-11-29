@@ -15,7 +15,7 @@ using namespace std;
 int Fenster_x = 1920;
 int Fenster_y = 1080;
 double rot_geschwindigkeit = 0.2;
-int Welle = 20;
+int Welle = 3;
 double PI = 3.1415962;
 string stringgeld = "Geld: ";
 string Nachricht = "";		//diesen string kannst du bei bedarf umbenennen, er wird rechts unten ausgegeben für nachrichten an spieler
@@ -37,8 +37,8 @@ bool bool_ziel;
 class Objekt {
 public:
 	Gosu::Image Bild;
-	double pos_x;
-	double pos_y;
+	double pos_x = Fenster_x;
+	double pos_y = Fenster_y;
 	double rot;
 	Objekt* Target_Objekt_Ptr;
 	Objekt(double x, double y, Objekt* oz, Gosu::Image B,double v, int L) : pos_x(x), pos_y(y), Target_Objekt_Ptr(oz) , Bild(B), v(v), Leben(L) {};
@@ -173,16 +173,16 @@ public:
 			temp_rot -= 360;
 		}
 		if (this->rot <= temp_rot) {
-			if ((temp_rot - this->rot) > 3) {
-				this->rot += 3;
+			if ((temp_rot - this->rot) > 5) {
+				this->rot += 5;
 			}
 			else {
 				this->rot = temp_rot;
 			}
 		}
 		else {
-			if ((this->rot - temp_rot) > 3) {
-				this->rot -= 3;
+			if ((this->rot - temp_rot) > 5) {
+				this->rot -= 5;
 			}
 			else {
 				this->rot = temp_rot;
@@ -196,6 +196,29 @@ public:
 	}
 
 };
+
+Raumschiff& Check_Maus(int x, int y, list<shared_ptr<Raumschiff>>& liste, int min_abstand) {
+	//gibt Zeiger auf markiertes Raumschiff aus
+	shared_ptr<Raumschiff> Ziel;
+	auto i = liste.begin();
+	bool_ziel = false;
+
+	while (i != liste.end()) {
+		{
+			double dx = (*i)->pos_x - x;
+			double dy = (*i)->pos_y - y;
+			double abstand = sqrt((dx * dx) + (dy * dy));
+			if (abstand < min_abstand)
+			{
+				min_abstand = abstand;
+				bool_ziel = true;
+				Ziel = *i;
+			}
+			i++;
+		}
+	}
+	return *Ziel;
+}
 void Zeiger_Update(list<Rakete> &liste, list<shared_ptr<Raumschiff>> &liste_Raumschiff, Raumschiff& i_raumschiff,Erde E) {
 	list<Rakete>::iterator i = liste.begin();
 	while (i != liste.end())
@@ -205,22 +228,18 @@ void Zeiger_Update(list<Rakete> &liste, list<shared_ptr<Raumschiff>> &liste_Raum
 			{
 				i->Target_Objekt_Ptr = &E;
 			}
-			if (i->Target_Objekt_Ptr == &E)
+			else if (i->Target_Objekt_Ptr == &E)
 			{
-				i->Target_Objekt_Ptr = &*liste_Raumschiff.back();
+				i->Target_Objekt_Ptr = &Check_Maus(E.pos_x, E.pos_x, liste_Raumschiff,10000);
 			}
 			else if (i->Target_Objekt_Ptr == &i_raumschiff)
-			{	
-				if (i->Target_Objekt_Ptr == &*liste_Raumschiff.back())
-				{
+			{					
 					i->Target_Objekt_Ptr = &E;
-				}
-				else
-				{
-					i->Target_Objekt_Ptr = &*liste_Raumschiff.back();
-				}
 			}
-		
+			if (sqrt((i->pos_x-Fenster_x/2)* (i->pos_x - Fenster_x / 2)+ (i->pos_y - Fenster_y / 2)* (i->pos_y - Fenster_y / 2)) > 700 )
+			{
+				i->Target_Objekt_Ptr = &Check_Maus(E.pos_x, E.pos_x, liste_Raumschiff, 10000);
+			}
 		i++;
 
 
@@ -299,9 +318,8 @@ void Update_Rakete(list<Rakete> &liste) {
 		i->rot_berechnen();
 		i->abstand_berechnen();
 		i->bewegung();
-		if (i->abstand <= 30) {
+		if (i->abstand <= 40) {
 			i->Target_Objekt_Ptr->Leben -= i->Schaden;
-			cout << i->Target_Objekt_Ptr->Leben << endl;
 			i = liste.erase(i);
 		}
 		else {
@@ -322,11 +340,11 @@ void Wellen_Update(int &Welle, double &Zeit, list<shared_ptr<Raumschiff>> &liste
 		Wellen_Funktion(liste, Welle, T1, T2, T3);
 
 	}
-	/*else if (liste.size() == 0) {
+	else if (liste.size() == 0) {
 		Welle += 1;
 		Zeit = 0;
 		Wellen_Funktion(liste, Welle, T1, T2, T3);
-	}*/
+	}
 }
 
 void Update_Raumschiff_draw(list<shared_ptr<Raumschiff>> &liste) {
@@ -351,34 +369,11 @@ void Raketen_Funktion(list<Rakete> &liste, Rakete& Rakete, Raumschiff& Raumschif
 }
 
 
-Raumschiff& Check_Maus(int x, int y, list<shared_ptr<Raumschiff>> & liste) {
-	//gibt Zeiger auf markiertes Raumschiff aus
-	int min_abstand = 100;
-	shared_ptr<Raumschiff> Ziel;
-	auto i = liste.begin();
-	bool_ziel = false;
-	
-	while (i != liste.end()) {
-		{
-			double dx = (*i)->pos_x - x;
-			double dy = (*i)->pos_y - y;
-			double abstand = sqrt((dx*dx) + (dy*dy));
-			if (abstand < min_abstand)
-			{
-				min_abstand = abstand;
-				bool_ziel = true;
-				Ziel = *i;
-			}
-			i++;
-		}
-	}
-	return *Ziel;
-}
 
 void draw_maus(int x,int y, list<shared_ptr<Raumschiff>> & liste, Gosu::Image Bild) {
-	Check_Maus(x, y, liste);
+	Check_Maus(x, y, liste,100);
 	if (bool_ziel == true) {
-	Check_Maus(x, y, liste).draw_markiert();		
+	Check_Maus(x, y, liste,100).draw_markiert();		
 	}
 }
 
@@ -498,6 +493,7 @@ public:
 		//
 		stringgeld += to_string(geld);
 		stringgeld += "$";
+		stringgeld = to_string(Raketen_Liste.size());
 		testfont.draw(stringgeld, 1660, 70, 1.0, 2.0, 2.0, Gosu::Color::RED);
 		stringgeld = "Geld: ";
 		Platzhalter.draw(1660.0, 130.0, 0.0, 0.1, 0.1);
@@ -595,13 +591,14 @@ public:
 		Wellen_Update(Welle, Zeit, Raumschiff_Liste, Typ1, Typ2, Typ3);
 		Update_Raumschiff(Raumschiff_Liste, Raketen_Liste, Erde);
 		Update_Rakete(Raketen_Liste);
+		Zeiger_Update(Raketen_Liste, Raumschiff_Liste, Typ1, Erde);
 		Erde.rot_berechnen();
 		x_maus = input().mouse_x();
 		y_maus = input().mouse_y();
 		if (Toggle_Maus_Links() == true) {
-			Check_Maus(x_maus, y_maus, Raumschiff_Liste);
+			Check_Maus(x_maus, y_maus, Raumschiff_Liste,100);
 			if(bool_ziel == true)
-			Raketen_Funktion(Raketen_Liste, Rakete, Check_Maus(x_maus, y_maus, Raumschiff_Liste));
+			Raketen_Funktion(Raketen_Liste, Rakete, Check_Maus(x_maus, y_maus, Raumschiff_Liste,100));
 		}
 		Laser.rot_berechnen();
 		Laser_Schaden(Raumschiff_Liste, Raketen_Liste, Laser);
