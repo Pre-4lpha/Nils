@@ -208,7 +208,7 @@ Raumschiff& Check_Maus(int x, int y, list<shared_ptr<Raumschiff>>& liste, int mi
 			double dx = (*i)->pos_x - x;
 			double dy = (*i)->pos_y - y;
 			double abstand = sqrt((dx * dx) + (dy * dy));
-			if (abstand < min_abstand)
+			if ((abstand < min_abstand)&&(abstand > 1))
 			{
 				min_abstand = abstand;
 				bool_ziel = true;
@@ -230,15 +230,15 @@ void Zeiger_Update(list<Rakete>& liste, list<shared_ptr<Raumschiff>>& liste_Raum
 		}
 		else if (i->Target_Objekt_Ptr == &E)
 		{
-			i->Target_Objekt_Ptr = &Check_Maus(i->pos_y, i->pos_x, liste_Raumschiff, 10000);
+			i->Target_Objekt_Ptr = &Check_Maus(i_raumschiff.pos_y, i_raumschiff.pos_x, liste_Raumschiff, 10000);
 		}
 		else if (i->Target_Objekt_Ptr == &i_raumschiff)
 		{
-			if (i->Target_Objekt_Ptr == &Check_Maus(i->pos_x, i->pos_y, liste_Raumschiff, 10000))
+			if (i->Target_Objekt_Ptr == &Check_Maus(i_raumschiff.pos_y, i_raumschiff.pos_x, liste_Raumschiff, 10000))
 			{
 				i->Target_Objekt_Ptr = &*liste_Raumschiff.front();
 			}
-			else i->Target_Objekt_Ptr = &Check_Maus(i->pos_x, i->pos_y, liste_Raumschiff, 10000);
+			else i->Target_Objekt_Ptr = &Check_Maus(i_raumschiff.pos_y, i_raumschiff.pos_x, liste_Raumschiff, 10000);
 		}
 		i++;
 
@@ -358,8 +358,9 @@ void Update_Rakete_draw(list<Rakete>& liste) {
 		i++;
 	}
 }
-void Raketen_Funktion(list<Rakete>& liste, Rakete& Rakete, Raumschiff& Raumschiff) {
+void Raketen_Funktion(list<Rakete>& liste, Rakete& Rakete, Raumschiff& Raumschiff,Erde Erde) {
 	Rakete.Target_Objekt_Ptr = &Raumschiff;
+	Rakete.rot = Erde.rot;
 	liste.push_back(Rakete);
 }
 void draw_maus(int x, int y, list<shared_ptr<Raumschiff>>& liste, Gosu::Image Bild) {
