@@ -136,6 +136,9 @@ public:
 	Erde(double x, double y, Objekt* oz, Gosu::Image B, double v, int L) : Objekt(x, y, oz, B, v, L) { }
 	void rot_berechnen() {
 		this->rot += v;
+		if (rot > 360) {
+			rot -= 360;
+		}
 	}
 	void draw()
 	{
@@ -674,17 +677,17 @@ public:
 				{
 					if ((rakete_auswahl == 1) && (geld >=100))
 					{
-						Raketen_Funktion(Raketen_Liste, Rakete_1, Check_Maus(x_maus, y_maus, Raumschiff_Liste, 100));
+						Raketen_Funktion(Raketen_Liste, Rakete_1, Check_Maus(x_maus, y_maus, Raumschiff_Liste, 100),Erde);
 						geld -= 100;
 					}
 					else if ((rakete_auswahl == 2) && (geld >= 200))
 					{
-						Raketen_Funktion(Raketen_Liste, Rakete_2, Check_Maus(x_maus, y_maus, Raumschiff_Liste, 100));
+						Raketen_Funktion(Raketen_Liste, Rakete_2, Check_Maus(x_maus, y_maus, Raumschiff_Liste, 100),Erde);
 						geld -= 200;
 					}
 					else if ((rakete_auswahl == 3) && (geld >= 400))
 					{
-						Raketen_Funktion(Raketen_Liste, Rakete_3, Check_Maus(x_maus, y_maus, Raumschiff_Liste, 100));
+						Raketen_Funktion(Raketen_Liste, Rakete_3, Check_Maus(x_maus, y_maus, Raumschiff_Liste, 100),Erde);
 						geld -= 400;
 					}
 				}
